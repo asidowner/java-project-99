@@ -17,7 +17,7 @@ RUN ./gradlew --no-daemon dependencies
 
 COPY config config
 COPY src src
-COPY .gitkeep public.pem* private.pem* src/main/resources/certs/
+COPY public.pem private.pem src/main/resources/certs/
 
 RUN ./gradlew --no-daemon build
 
