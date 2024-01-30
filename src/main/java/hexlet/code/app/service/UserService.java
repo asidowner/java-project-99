@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static hexlet.code.app.util.ListUtils.getPageRequest;
+
 @Service
 public class UserService implements UserDetailsManager {
 
@@ -25,8 +27,10 @@ public class UserService implements UserDetailsManager {
     @Autowired
     private UserRepository userRepository;
 
-    public List<UserDTO> getAll() {
-        return userRepository.findAll()
+    public List<UserDTO> getAll(Integer start, Integer end, String orderDirection, String orderProperty) {
+        var pageRequest = getPageRequest(start, end, orderDirection, orderProperty);
+
+        return userRepository.findAll(pageRequest)
                 .stream()
                 .map(userMapper::map)
                 .toList();
