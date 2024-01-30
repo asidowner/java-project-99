@@ -3,7 +3,9 @@ package hexlet.code.app.controller.api;
 import hexlet.code.app.dto.UserCreateDTO;
 import hexlet.code.app.dto.UserDTO;
 import hexlet.code.app.dto.UserUpdateDTO;
+import hexlet.code.app.exception.ResourceForbiddenException;
 import hexlet.code.app.service.UserService;
+import hexlet.code.app.util.UserUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,9 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserUtils userUtils;
+
     @GetMapping("/users")
     public List<UserDTO> index() {
         return userService.getAll();
@@ -44,12 +49,22 @@ public class UserController {
 
     @PutMapping("/users/{id}")
     public UserDTO update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO data) {
+        var currentUser = userUtils.getCurrentUser();
+
+        if (!currentUser.getId().equals(id)) {
+            throw new ResourceForbiddenException();
+        }
         return userService.update(id, data);
     }
 
     @DeleteMapping("/users/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
+        var currentUser = userUtils.getCurrentUser();
+
+        if (!currentUser.getId().equals(id)) {
+            throw new ResourceForbiddenException();
+        }
         userService.delete(id);
     }
 }

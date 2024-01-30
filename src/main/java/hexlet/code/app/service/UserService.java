@@ -48,6 +48,7 @@ public class UserService implements UserDetailsManager {
     public UserDTO update(Long id, UserUpdateDTO data) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(NOT_FOUND_MESSAGE));
+
         userMapper.update(data, user);
         userRepository.save(user);
         return userMapper.map(user);

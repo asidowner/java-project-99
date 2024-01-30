@@ -44,4 +44,8 @@ public abstract class UserMapper {
         }
     }
 
+    public void encryptPassword(User model) {
+        var password = model.getPassword();
+        model.setPassword(passwordEncoder.encode(password));
+    }
 }

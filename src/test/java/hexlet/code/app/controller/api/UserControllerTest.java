@@ -1,10 +1,11 @@
-package hexlet.code.app.controller;
+package hexlet.code.app.controller.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.model.User;
 import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.util.ModelGenerator;
+import hexlet.code.app.util.UserUtils;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,12 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Map;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -46,17 +49,20 @@ class UserControllerTest {
     private Faker faker;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserUtils userUtils;
+
+    private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
 
     @BeforeEach
     public void setUp() {
         testUser = Instancio.of(modelGenerator.getUserModel()).create();
+        token = jwt().jwt(builder -> builder.subject(userUtils.getTestUser().getEmail()));
     }
 
     @Test
     public void testIndex() throws Exception {
         userRepository.save(testUser);
-        var result = mockMvc.perform(get("/api/users"))
+        var result = mockMvc.perform(get("/api/users").with(token))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -68,7 +74,7 @@ class UserControllerTest {
     public void testShow() throws Exception {
         userRepository.save(testUser);
 
-        var request = get("/api/users/{id}", testUser.getId());
+        var request = get("/api/users/{id}", testUser.getId()).with(token);
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();
@@ -84,7 +90,7 @@ class UserControllerTest {
 
     @Test
     public void testShowNegative() throws Exception {
-        var request = get("/api/users/{id}", 99999);
+        var request = get("/api/users/{id}", 99999).with(token);
         mockMvc.perform(request)
                 .andExpect(status().isNotFound());
     }
@@ -92,6 +98,7 @@ class UserControllerTest {
     @Test
     public void testCreate() throws Exception {
         var request = post("/api/users")
+                .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(testUser));
 
@@ -111,9 +118,12 @@ class UserControllerTest {
     public void testUpdateEmail() throws Exception {
         userRepository.save(testUser);
 
+        var testToken = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
+
         var newEmail = faker.internet().emailAddress();
 
         var request = put("/api/users/{id}", testUser.getId())
+                .with(testToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(Map.of("email", newEmail)));
 
@@ -132,9 +142,12 @@ class UserControllerTest {
     public void testUpdatePassword() throws Exception {
         userRepository.save(testUser);
 
+        var testToken = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
+
         var newPassword = faker.internet().emailAddress();
 
         var request = put("/api/users/{id}", testUser.getId())
+                .with(testToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(Map.of("password", newPassword)));
 
@@ -150,11 +163,28 @@ class UserControllerTest {
     }
 
     @Test
+    public void testUpdateByOtherUser() throws Exception {
+        userRepository.save(testUser);
+
+        var newEmail = faker.internet().emailAddress();
+        var newPassword = faker.internet().emailAddress();
+
+        var request = put("/api/users/{id}", testUser.getId())
+                .with(token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(Map.of("password", newPassword, "email", newEmail)));
+
+        mockMvc.perform(request)
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     public void testDelete() throws Exception {
         userRepository.save(testUser);
 
+        var testToken = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
 
-        var request = delete("/api/users/{id}", testUser.getId());
+        var request = delete("/api/users/{id}", testUser.getId()).with(testToken);
 
         mockMvc.perform(request)
                 .andExpect(status().isNoContent());
@@ -162,5 +192,67 @@ class UserControllerTest {
         var user = userRepository.findByEmail(testUser.getEmail());
 
         assertThat(user.isPresent()).isFalse();
+    }
+
+    @Test
+    public void testDeleteByOtherUser() throws Exception {
+        userRepository.save(testUser);
+
+        var request = delete("/api/users/{id}", testUser.getId())
+                .with(token)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(request)
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testIndexWithoutAuth() throws Exception {
+        userRepository.save(testUser);
+        mockMvc.perform(get("/api/users"))
+                .andExpect(status().isUnauthorized());
+
+    }
+
+    @Test
+    public void testShowWithoutAuth() throws Exception {
+        userRepository.save(testUser);
+        mockMvc.perform(get("/api/users/{id}", testUser.getId()))
+                .andExpect(status().isUnauthorized());
+
+    }
+
+    @Test
+    public void testCreateWithoutAuth() throws Exception {
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(testUser)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testUpdateWithoutAuth() throws Exception {
+        userRepository.save(testUser);
+
+        var newEmail = faker.internet().emailAddress();
+        var newPassword = faker.internet().emailAddress();
+
+        var request = put("/api/users/{id}", testUser.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(Map.of("password", newPassword, "email", newEmail)));
+
+        mockMvc.perform(request)
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testDeleteWithoutAuth() throws Exception {
+        userRepository.save(testUser);
+
+        var request = delete("/api/users/{id}", testUser.getId())
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(request)
+                .andExpect(status().isUnauthorized());
     }
 }
