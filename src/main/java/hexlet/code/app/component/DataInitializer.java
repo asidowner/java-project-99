@@ -23,8 +23,6 @@ public class DataInitializer implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         if (userRepository.findByEmail("hexlet@example.com").isEmpty()) {
             var userData = new UserCreateDTO();
-            userData.setFirstName("hexlet");
-            userData.setLastName("example");
             userData.setEmail("hexlet@example.com");
             userData.setPassword("qwerty");
             var user = userMapper.map(userData);

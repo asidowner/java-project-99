@@ -114,17 +114,21 @@ class UserControllerTest {
     }
 
     @Test
-    public void testUpdateEmail() throws Exception {
+    public void testUpdate() throws Exception {
         userRepository.save(testUser);
 
         var testToken = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
 
+        var newFirstName = faker.name().firstName();
+        var newLastName = faker.name().lastName();
         var newEmail = faker.internet().emailAddress();
+
+        var requestData = Map.of("email", newEmail, "firstName", newFirstName, "lastName", newLastName);
 
         var request = put("/api/users/{id}", testUser.getId())
                 .with(testToken)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(Map.of("email", newEmail)));
+                .content(om.writeValueAsString(requestData));
 
         mockMvc.perform(request)
                 .andExpect(status().isOk());
@@ -133,8 +137,8 @@ class UserControllerTest {
 
         assertThat(user.isPresent()).isTrue();
         assertThat(user.get().getEmail()).isEqualTo(newEmail).isNotEqualTo(testUser.getEmail());
-        assertThat(user.get().getFirstName()).isEqualTo(testUser.getFirstName());
-        assertThat(user.get().getLastName()).isEqualTo(testUser.getLastName());
+        assertThat(user.get().getFirstName()).isEqualTo(newFirstName).isNotEqualTo(testUser.getFirstName());
+        assertThat(user.get().getLastName()).isEqualTo(newLastName).isNotEqualTo(testUser.getLastName());
     }
 
     @Test

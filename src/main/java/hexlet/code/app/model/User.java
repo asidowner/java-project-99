@@ -40,11 +40,9 @@ public class User implements UserDetails, BaseEntity {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @NotBlank
     @ToString.Include
     private String firstName;
 
-    @NotBlank
     @ToString.Include
     private String lastName;
 
