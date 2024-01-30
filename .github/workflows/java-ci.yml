@@ -17,10 +17,8 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-      - name: Generate Private key
-        run: openssl genpkey -out ${{github.workspace}}/src/main/resources/certs/private.pem -algorithm RSA -pkeyopt rsa_keygen_bits:2048
-      - name: Generate Public key
-        run: openssl rsa -in ${{github.workspace}}/src/main/resources/certs/private.pem -pubout -out ${{github.workspace}}/src/main/resources/certs/public.pem
+      - name: Generate keys
+        run: make generate_rsa
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
         with:
