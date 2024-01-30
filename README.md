@@ -11,6 +11,14 @@ It is a simple Task Manager application. User can log in, create new task, chang
 ### See on render.com
 https://task-manager-rjgx.onrender.com/
 
+### Local development
+
+Run
+```shell
+export SPRING_PROFILES_ACTIVE=development
+make generate_rsa
+```
+
 ### Build
 ```shell
 ./gradlew --no-daemon dependencies
@@ -31,3 +39,14 @@ docker build -t task-manager-app .
 ```shell
 docker run -dp 127.0.0.1:8080:8080 task-manager-app
 ```
+### Deploy on render
+Need set enviroment variables:
+
+   * DATABASE_URL - DB Url in format: jdbc:postgresql://host:port/databaseName
+   * DATABASE_PASSWORD - DB password
+   * DATABASE_USERNAME - DB login
+   * SPRING_PROFILES_ACTIVE = production
+
+Also, need add 2 secret files:
+   * private.pem - RSA private key.
+   * public.pem - RSA publick key.
