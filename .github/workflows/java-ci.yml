@@ -18,7 +18,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
       - name: Generate RSA
-        run: make generate_rsa
+        run: cd ${{github.workspace}} && make generate_rsa
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
         with:
