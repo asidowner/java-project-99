@@ -4,9 +4,5 @@ spring:
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
 
-rsa:
-  private-key: ${RSA_PRIVATE_KEY}
-  public-key: ${RSA_PUBLIC_KEY}
-
 server:
   port: ${PORT}

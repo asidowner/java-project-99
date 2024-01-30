@@ -9,5 +9,9 @@ logging:
     root: WARN
     org:
       springframework:
-        web: DEBUG
+        web: WARN
         security: DEBUG
+
+rsa:
+  private-key: ${RSA_PRIVATE_KEY:classpath:certs/private.pem}
+  public-key: ${RSA_PUBLIC_KEY:classpath:certs/public.pem}
