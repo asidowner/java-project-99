@@ -3,8 +3,10 @@ spring:
     url: ${DATABASE_URL}
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+rsa:
+  private-key: ${RSA_PRIVATE_KEY}
+  public-key: ${RSA_PUBLIC_KEY}
 
 server:
   port: ${PORT}

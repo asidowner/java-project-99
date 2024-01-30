@@ -3,3 +3,11 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+
+logging:
+  level:
+    root: WARN
+    org:
+      springframework:
+        web: DEBUG
+        security: DEBUG
