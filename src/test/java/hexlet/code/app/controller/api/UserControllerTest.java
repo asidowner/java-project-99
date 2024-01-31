@@ -65,8 +65,35 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
+        var totalCount = result.getResponse().getHeader("X-Total-Count");
+
+        assertThat(totalCount).isNotNull();
+        assertThat(Long.valueOf(totalCount)).isEqualTo(userRepository.count());
+
         var body = result.getResponse().getContentAsString();
         assertThatJson(body).isArray();
+    }
+
+    @Test
+    public void testIndexOrderAndPaging() throws Exception {
+        var start = 10;
+        var end = 20;
+        var order = "DESC";
+        var sort = "id";
+
+        var request = get("/api/users")
+                .with(token)
+                .param("_start", String.valueOf(start))
+                .param("_end", String.valueOf(end))
+                .param("_order", order)
+                .param("_sort", sort);
+
+        var result = mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andReturn();
+
+        var body = result.getResponse().getContentAsString();
+        assertThatJson(body).isArray().isEmpty();
     }
 
     @Test

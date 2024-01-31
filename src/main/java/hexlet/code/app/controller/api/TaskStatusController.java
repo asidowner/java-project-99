@@ -1,11 +1,9 @@
 package hexlet.code.app.controller.api;
 
-import hexlet.code.app.dto.UserCreateDTO;
-import hexlet.code.app.dto.UserDTO;
-import hexlet.code.app.dto.UserUpdateDTO;
-import hexlet.code.app.exception.ResourceForbiddenException;
-import hexlet.code.app.service.UserService;
-import hexlet.code.app.util.UserUtils;
+import hexlet.code.app.dto.TaskStatusCreateDTO;
+import hexlet.code.app.dto.TaskStatusDTO;
+import hexlet.code.app.dto.TaskStatusUpdateDTO;
+import hexlet.code.app.service.TaskStatusService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,57 +22,46 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/api/users")
-public class UserController {
+@RequestMapping(path = "/api/task_statuses")
+public class TaskStatusController {
 
     @Autowired
-    private UserService userService;
+    private TaskStatusService taskStatusService;
 
-    @Autowired
-    private UserUtils userUtils;
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> index(
+    public ResponseEntity<List<TaskStatusDTO>> index(
             @RequestParam(defaultValue = "0", name = "_start") Integer start,
             @RequestParam(defaultValue = "10", name = "_end") Integer end,
             @RequestParam(defaultValue = "ASC", name = "_order") String orderDirection,
             @RequestParam(defaultValue = "id", name = "_sort") String orderProperty
     ) {
-        var users = userService.getAll(start, end, orderDirection, orderProperty);
+        var users = taskStatusService.getAll(start, end, orderDirection, orderProperty);
         return ResponseEntity.ok()
-                .header("X-Total-Count", String.valueOf(userService.countAll()))
+                .header("X-Total-Count", String.valueOf(taskStatusService.countAll()))
                 .body(users);
     }
 
     @GetMapping("/{id}")
-    public UserDTO show(@PathVariable Long id) {
-        return userService.findById(id);
+    public TaskStatusDTO show(@PathVariable Long id) {
+        return taskStatusService.findById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDTO create(@Valid @RequestBody UserCreateDTO data) {
-        return userService.create(data);
+    public TaskStatusDTO create(@Valid @RequestBody TaskStatusCreateDTO data) {
+        return taskStatusService.create(data);
     }
 
     @PutMapping("/{id}")
-    public UserDTO update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO data) {
-        var currentUser = userUtils.getCurrentUser();
-
-        if (!currentUser.getId().equals(id)) {
-            throw new ResourceForbiddenException();
-        }
-        return userService.update(id, data);
+    public TaskStatusDTO update(@PathVariable Long id, @Valid @RequestBody TaskStatusUpdateDTO data) {
+        return taskStatusService.update(id, data);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
-        var currentUser = userUtils.getCurrentUser();
-
-        if (!currentUser.getId().equals(id)) {
-            throw new ResourceForbiddenException();
-        }
-        userService.delete(id);
+        taskStatusService.delete(id);
     }
+
 }

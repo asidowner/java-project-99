@@ -27,6 +27,10 @@ public class UserService implements UserDetailsManager {
     @Autowired
     private UserRepository userRepository;
 
+    public Long countAll() {
+        return userRepository.count();
+    }
+
     public List<UserDTO> getAll(Integer start, Integer end, String orderDirection, String orderProperty) {
         var pageRequest = getPageRequest(start, end, orderDirection, orderProperty);
 
