@@ -40,20 +40,23 @@ public class DataInitializer implements ApplicationRunner {
             userRepository.save(user);
         }
 
-        var taskStatuses = Map.of(
-                        "Draft", "draft",
-                        "ToReview", "to_review",
-                        "ToBeFixed", "to_be_fixed",
-                        "ToPublish", "to_publish",
-                        "Published", "published"
-                ).entrySet()
-                .stream()
-                .map(entry -> {
-                    var taskStatusData = new TaskStatusCreateDTO();
-                    taskStatusData.setName(entry.getKey());
-                    taskStatusData.setSlug(entry.getValue());
-                    return taskStatusMapper.map(taskStatusData);
-                });
-        taskStatuses.forEach(taskStatusRepository::save);
+
+        if (taskStatusRepository.count() == 0) {
+            var taskStatuses = Map.of(
+                            "Draft", "draft",
+                            "ToReview", "to_review",
+                            "ToBeFixed", "to_be_fixed",
+                            "ToPublish", "to_publish",
+                            "Published", "published"
+                    ).entrySet()
+                    .stream()
+                    .map(entry -> {
+                        var taskStatusData = new TaskStatusCreateDTO();
+                        taskStatusData.setName(entry.getKey());
+                        taskStatusData.setSlug(entry.getValue());
+                        return taskStatusMapper.map(taskStatusData);
+                    });
+            taskStatuses.forEach(taskStatusRepository::save);
+        }
     }
 }
