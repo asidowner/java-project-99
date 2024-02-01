@@ -1,8 +1,8 @@
 package hexlet.code.app.controller.api;
 
-import hexlet.code.app.dto.UserCreateDTO;
-import hexlet.code.app.dto.UserDTO;
-import hexlet.code.app.dto.UserUpdateDTO;
+import hexlet.code.app.dto.UserDTO.UserCreateDTO;
+import hexlet.code.app.dto.UserDTO.UserDTO;
+import hexlet.code.app.dto.UserDTO.UserUpdateDTO;
 import hexlet.code.app.exception.ResourceForbiddenException;
 import hexlet.code.app.service.UserService;
 import hexlet.code.app.util.UserUtils;

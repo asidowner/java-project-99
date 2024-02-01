@@ -1,7 +1,7 @@
 package hexlet.code.app.component;
 
-import hexlet.code.app.dto.TaskStatusCreateDTO;
-import hexlet.code.app.dto.UserCreateDTO;
+import hexlet.code.app.dto.TaskStatusDTO.TaskStatusCreateDTO;
+import hexlet.code.app.dto.UserDTO.UserCreateDTO;
 import hexlet.code.app.mapper.TaskStatusMapper;
 import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.repository.TaskStatusRepository;

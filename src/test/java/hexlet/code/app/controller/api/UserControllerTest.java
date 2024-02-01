@@ -2,6 +2,8 @@ package hexlet.code.app.controller.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.app.model.User;
+import hexlet.code.app.repository.TaskRepository;
+import hexlet.code.app.repository.TaskStatusRepository;
 import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.util.ModelGenerator;
 import hexlet.code.app.util.UserUtils;
@@ -49,6 +51,12 @@ class UserControllerTest {
 
     @Autowired
     private UserUtils userUtils;
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private TaskStatusRepository taskStatusRepository;
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
 
@@ -234,6 +242,28 @@ class UserControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testDeleteWithTask() throws Exception {
+        userRepository.save(testUser);
+
+        var testToken = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
+
+        var taskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
+        taskStatusRepository.save(taskStatus);
+
+        var task = Instancio.of(modelGenerator.getTaskModel()).create();
+        task.setAssignee(testUser);
+        task.setTaskStatus(taskStatus);
+        taskRepository.save(task);
+
+        var request = delete("/api/users/{id}", testUser.getId())
+                .with(testToken)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(request)
+                .andExpect(status().isConflict());
     }
 
     @Test
