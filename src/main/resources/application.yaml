@@ -16,3 +16,21 @@ logging:
 rsa:
   private-key: classpath:certs/private.pem
   public-key: classpath:certs/public.pem
+
+
+task:
+  default-statuses:
+    - name: Draft
+      slug: draft
+    - name: ToReview
+      slug: to_review
+    - name: ToBeFixed
+      slug: to_be_fixed
+    - name: ToPublish
+      slug: to_publish
+    - name: Published
+      slug: published
+
+admin:
+  email: hexlet@example.com
+  password: qwerty

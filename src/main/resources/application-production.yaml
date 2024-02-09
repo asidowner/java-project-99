@@ -6,3 +6,7 @@ spring:
 
 server:
   port: ${PORT}
+
+admin:
+  email: ${ADMIN_EMAIL:hexlet@example.com}
+  password: ${ADMIN_PASSWORD:qwerty}

@@ -12,11 +12,9 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 @Component
 @AllArgsConstructor
-public class DataInitializer implements ApplicationRunner {
+class DataInitializer implements ApplicationRunner {
 
     @Autowired
     private final UserRepository userRepository;
@@ -30,30 +28,30 @@ public class DataInitializer implements ApplicationRunner {
     @Autowired
     private final TaskStatusRepository taskStatusRepository;
 
+    @Autowired
+    private final AdminProperties adminProperties;
+
+    @Autowired
+    private final TaskStatusProperties taskStatusProperties;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         if (userRepository.findByEmail("hexlet@example.com").isEmpty()) {
             var userData = new UserCreateDTO();
-            userData.setEmail("hexlet@example.com");
-            userData.setPassword("qwerty");
+            userData.setEmail(adminProperties.getEmail());
+            userData.setPassword(adminProperties.getPassword());
             var user = userMapper.map(userData);
             userRepository.save(user);
         }
 
 
         if (taskStatusRepository.count() == 0) {
-            var taskStatuses = Map.of(
-                            "Draft", "draft",
-                            "ToReview", "to_review",
-                            "ToBeFixed", "to_be_fixed",
-                            "ToPublish", "to_publish",
-                            "Published", "published"
-                    ).entrySet()
+            var taskStatuses = taskStatusProperties.getDefaultStatuses()
                     .stream()
-                    .map(entry -> {
+                    .map(map -> {
                         var taskStatusData = new TaskStatusCreateDTO();
-                        taskStatusData.setName(entry.getKey());
-                        taskStatusData.setSlug(entry.getValue());
+                        taskStatusData.setName(map.get("name"));
+                        taskStatusData.setSlug(map.get("slug"));
                         return taskStatusMapper.map(taskStatusData);
                     });
             taskStatuses.forEach(taskStatusRepository::save);
