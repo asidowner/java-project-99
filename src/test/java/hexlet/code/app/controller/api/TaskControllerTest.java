@@ -1,8 +1,10 @@
 package hexlet.code.app.controller.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
+import hexlet.code.app.repository.LabelRepository;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.TaskStatusRepository;
 import hexlet.code.app.repository.UserRepository;
@@ -19,8 +21,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.io.Serializable;
 import java.util.Map;
+import java.util.Set;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,6 +59,9 @@ public class TaskControllerTest {
     private TaskStatusRepository taskStatusRepository;
 
     @Autowired
+    private LabelRepository labelRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -67,9 +72,13 @@ public class TaskControllerTest {
         TaskStatus testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
         taskStatusRepository.save(testTaskStatus);
 
+        Label testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
+        labelRepository.save(testLabel);
+
         testTask = Instancio.of(modelGenerator.getTaskModel()).create();
         testTask.setTaskStatus(testTaskStatus);
         testTask.setAssignee(userUtils.getTestUser());
+        testTask.setLabels(Set.of(testLabel));
 
         token = jwt().jwt(builder -> builder.subject(userUtils.getTestUser().getEmail()));
     }
@@ -205,13 +214,17 @@ public class TaskControllerTest {
     }
 
 
-    private Map<String, ? extends Serializable> getTaskCreateRequest() {
+    private Map<String, ?> getTaskCreateRequest() {
         return Map.of(
                 "index", testTask.getIndex(),
                 "title", testTask.getName(),
                 "content", testTask.getDescription(),
                 "assignee_id", testTask.getAssignee().getId(),
-                "status", testTask.getTaskStatus().getSlug()
+                "status", testTask.getTaskStatus().getSlug(),
+                "taskLabelIds", testTask.getLabels()
+                        .stream()
+                        .map(Label::getId)
+                        .toList()
         );
     }
 

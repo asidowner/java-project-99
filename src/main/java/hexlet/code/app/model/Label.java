@@ -1,17 +1,16 @@
 package hexlet.code.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,37 +28,26 @@ import java.util.Set;
 @EntityListeners(AuditingEntityListener.class)
 @ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Table(name = "tasks")
-public class Task implements BaseEntity {
+@Table(name = "labels")
+public class Label implements BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ToString.Include
     @EqualsAndHashCode.Include
     private Long id;
 
+
     @ToString.Include
     @NotBlank
+    @Column(unique = true)
+    @Size(min = 3, max = 1000)
     private String name;
-
-    @ToString.Include
-    private Integer index;
-
-    @ToString.Include
-    private String description;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "task_status_id", nullable = false)
-    @NotNull
-    private TaskStatus taskStatus;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "assignee_id", nullable = false)
-    @NotNull
-    private User assignee;
 
     @CreatedDate
     private LocalDate createdAt;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Label> labels = new HashSet<>();
+    @ManyToMany
+    @JsonIgnore
+    private Set<Task> tasks = new HashSet<>();
 }

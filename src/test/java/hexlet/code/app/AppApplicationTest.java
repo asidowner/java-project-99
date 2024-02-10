@@ -28,4 +28,14 @@ class AppApplicationTest {
         assertThat(body).isNotBlank();
     }
 
+    @Test
+    public void testSwaggerAvailable() throws Exception {
+        var response = mockMvc.perform(get("/swagger-ui/index.html").contentType(MediaType.TEXT_HTML))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        var body = response.getResponse().getContentAsString();
+        assertThat(body).isNotBlank();
+    }
+
 }

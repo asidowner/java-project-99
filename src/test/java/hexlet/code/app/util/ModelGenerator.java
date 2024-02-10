@@ -1,5 +1,6 @@
 package hexlet.code.app.util;
 
+import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
 import hexlet.code.app.model.User;
@@ -16,8 +17,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class ModelGenerator {
     private Model<User> userModel;
+
     private Model<TaskStatus> taskStatusModel;
+
     private Model<Task> taskModel;
+
+    private Model<Label> labelModel;
 
     @Autowired
     private UserUtils userUtils;
@@ -48,9 +53,16 @@ public class ModelGenerator {
                 .ignore(Select.field(Task::getCreatedAt))
                 .ignore(Select.field(Task::getTaskStatus))
                 .ignore(Select.field(Task::getAssignee))
+                .ignore(Select.field(Task::getLabels))
                 .supply(Select.field(Task::getName), () -> faker.text().text())
                 .supply(Select.field(Task::getIndex), () -> faker.number().randomDigit())
                 .supply(Select.field(Task::getDescription), () -> faker.text().text())
+                .toModel();
+
+        labelModel = Instancio.of(Label.class)
+                .ignore(Select.field(Label::getCreatedAt))
+                .ignore(Select.field(Label::getTasks))
+                .supply(Select.field(Label::getName), () -> faker.text().text(3, 1000))
                 .toModel();
     }
 }

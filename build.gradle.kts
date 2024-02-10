@@ -37,6 +37,8 @@ dependencies {
     implementation("org.mapstruct:mapstruct:1.5.5.Final")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.16.1")
     implementation("org.openapitools:jackson-databind-nullable:0.2.6")
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
     runtimeOnly("com.h2database:h2:2.2.224")

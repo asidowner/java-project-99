@@ -31,6 +31,14 @@ task:
     - name: Published
       slug: published
 
+label:
+  default-labels:
+    - feature
+    - bug
+
 admin:
   email: hexlet@example.com
   password: qwerty
+springdoc:
+  api-docs:
+    path: /swagger-ui/api-docs

@@ -4,6 +4,8 @@ import hexlet.code.app.dto.TaskStatusDTO.TaskStatusCreateDTO;
 import hexlet.code.app.dto.UserDTO.UserCreateDTO;
 import hexlet.code.app.mapper.TaskStatusMapper;
 import hexlet.code.app.mapper.UserMapper;
+import hexlet.code.app.model.Label;
+import hexlet.code.app.repository.LabelRepository;
 import hexlet.code.app.repository.TaskStatusRepository;
 import hexlet.code.app.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -34,6 +36,12 @@ class DataInitializer implements ApplicationRunner {
     @Autowired
     private final TaskStatusProperties taskStatusProperties;
 
+    @Autowired
+    private final LabelProperties labelProperties;
+
+    @Autowired
+    private final LabelRepository labelRepository;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         if (userRepository.findByEmail("hexlet@example.com").isEmpty()) {
@@ -55,6 +63,17 @@ class DataInitializer implements ApplicationRunner {
                         return taskStatusMapper.map(taskStatusData);
                     });
             taskStatuses.forEach(taskStatusRepository::save);
+        }
+
+        if (labelRepository.count() == 0) {
+            var labels = labelProperties.getDefaultLabels()
+                    .stream()
+                    .map(item -> {
+                        var label = new Label();
+                        label.setName(item);
+                        return label;
+                    });
+            labels.forEach(labelRepository::save);
         }
     }
 }
