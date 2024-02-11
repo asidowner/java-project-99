@@ -8,6 +8,7 @@ import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskStatusRepository;
+import hexlet.code.repository.UserRepository;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -34,11 +35,15 @@ public abstract class TaskMapper {
     @Autowired
     private LabelRepository labelRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     private static final String STATUS_NOT_FOUND_MESSAGE = "Status not found";
 
     private static final String LABEL_NOT_FOUND_MESSAGE = "Label not found";
 
-    @Mapping(target = "assignee.id", source = "assigneeId")
+    private static final String USER_NOT_FOUND_MESSAGE = "User not found";
+
     public abstract Task map(TaskCreateDTO dto);
 
     @Mapping(target = "assigneeId", source = "assignee.id")
@@ -46,7 +51,6 @@ public abstract class TaskMapper {
     @Mapping(target = "labelIds", expression = "java(labelsToLabelIds(model.getLabels()))")
     public abstract TaskDTO map(Task model);
 
-    @Mapping(target = "assignee.id", source = "assigneeId")
     public abstract void update(TaskUpdateDTO dto, @MappingTarget Task model);
 
     @AfterMapping
@@ -57,12 +61,18 @@ public abstract class TaskMapper {
         if (dto.getLabelIds() != null) {
             setLabels(dto.getLabelIds().get(), model);
         }
+        if (dto.getAssigneeId() != null) {
+            setAssignee(dto.getAssigneeId().get(), model);
+        }
     }
 
     @AfterMapping
     public void afterCreateMapping(TaskCreateDTO dto, @MappingTarget Task model) {
         setStatus(dto.getStatus(), model);
         setLabels(dto.getLabelIds(), model);
+        if (dto.getAssigneeId() != null) {
+            setAssignee(dto.getAssigneeId(), model);
+        }
     }
 
     private void setStatus(String slug, Task model) {
@@ -79,6 +89,12 @@ public abstract class TaskMapper {
         }
 
         model.setLabels(labels);
+    }
+
+    private void setAssignee(Long id, Task model) {
+        var assignee = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE));
+        model.setAssignee(assignee);
     }
 
     public Set<Long> labelsToLabelIds(Set<Label> labels) {

@@ -16,6 +16,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -48,13 +50,11 @@ public class Task implements BaseEntity {
     private String description;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "task_status_id", nullable = false)
-    @NotNull
+    @JoinColumn(name = "task_status_id")
     private TaskStatus taskStatus;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "assignee_id", nullable = false)
-    @NotNull
+    @JoinColumn(name = "assignee_id")
     private User assignee;
 
     @CreatedDate

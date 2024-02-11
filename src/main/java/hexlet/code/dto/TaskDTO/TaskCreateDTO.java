@@ -20,14 +20,12 @@ public class TaskCreateDTO {
     @JsonProperty("content")
     private String description;
 
-    @NotNull
     @JsonProperty("assignee_id")
     private Long assigneeId;
 
     @NotNull
     private String status;
 
-    @NotNull
     @JsonProperty("taskLabelIds")
     private Set<Long> labelIds;
 }
