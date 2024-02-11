@@ -8,6 +8,7 @@ plugins {
     id("org.springframework.boot") version "3.2.2"
     id("io.spring.dependency-management") version "1.1.4"
     id("com.github.ben-manes.versions") version "0.51.0"
+    id("io.sentry.jvm.gradle") version "4.3.0"
 }
 
 group = "hexlet.code"
@@ -86,4 +87,15 @@ tasks.named<DependencyUpdatesTask>("dependencyUpdates").configure {
 	rejectVersionIf {
 		isNonStable(candidate.version)
 	}
+}
+
+sentry {
+    // Generates a JVM (Java, Kotlin, etc.) source bundle and uploads your source code to Sentry.
+    // This enables source context, allowing you to see your source
+    // code as part of your stack traces in Sentry.
+    includeSourceContext = true
+
+    org = "sidorenkov-anton"
+    projectName = "java-spring-boot"
+    authToken = System.getenv("SENTRY_AUTH_TOKEN")
 }

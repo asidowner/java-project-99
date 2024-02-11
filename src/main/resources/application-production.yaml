@@ -10,3 +10,7 @@ server:
 admin:
   email: ${ADMIN_EMAIL:hexlet@example.com}
   password: ${ADMIN_PASSWORD:qwerty}
+
+sentry:
+  dsn: https://923653573fe381eb5f20815fd21ea6bd@o4504555492409344.ingest.sentry.io/4506729129836544
+  traces-sample-rate: 1.0

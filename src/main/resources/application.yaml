@@ -39,6 +39,7 @@ label:
 admin:
   email: hexlet@example.com
   password: qwerty
+
 springdoc:
   api-docs:
     path: /swagger-ui/api-docs
