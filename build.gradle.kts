@@ -1,7 +1,7 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 
 plugins {
-    java
+    application
     id("checkstyle")
     id("jacoco")
     id("io.freefair.lombok") version "8.4"
@@ -16,6 +16,10 @@ version = "0.0.1-SNAPSHOT"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_20
+}
+
+application {
+    mainClass.set("hexlet.code.AppApplication")
 }
 
 configurations {
