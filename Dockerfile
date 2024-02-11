@@ -3,7 +3,9 @@ FROM eclipse-temurin:21-jdk
 ARG GRADLE_VERSION=8.5
 
 ENV PORT=8080
-
+ENV SENTRY_AUTH_TOKEN ${SENTRY_AUTH_TOKEN}
+ENV SENTRY_DSN ${SENTRY_DSN}
+ENV SENTRY_LOG_LEVEL=debug
 RUN apt-get update && apt-get install -yq make unzip
 
 WORKDIR /backend
