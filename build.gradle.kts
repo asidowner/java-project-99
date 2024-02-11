@@ -19,7 +19,7 @@ java {
 }
 
 application {
-    mainClass.set("hexlet.code.AppApplication")
+    mainClass.set("hexlet.code.app.AppApplication")
 }
 
 configurations {
