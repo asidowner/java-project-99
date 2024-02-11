@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
+import hexlet.code.app.model.User;
 import hexlet.code.app.repository.LabelRepository;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.TaskStatusRepository;
@@ -120,6 +121,53 @@ public class TaskControllerTest {
 
         var body = result.getResponse().getContentAsString();
         assertThatJson(body).isArray().isEmpty();
+    }
+
+    @Test
+    public void testIndexFilter() throws Exception {
+        taskRepository.save(testTask);
+
+        TaskStatus secondStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
+        taskStatusRepository.save(secondStatus);
+
+        Label secondLabel = Instancio.of(modelGenerator.getLabelModel()).create();
+        labelRepository.save(secondLabel);
+
+        User secondUser = Instancio.of(modelGenerator.getUserModel()).create();
+        userRepository.save(secondUser);
+
+        var secondTestTask = Instancio.of(modelGenerator.getTaskModel()).create();
+        secondTestTask.setLabels(Set.of(secondLabel));
+        secondTestTask.setAssignee(secondUser);
+        secondTestTask.setTaskStatus(secondStatus);
+        taskRepository.save(secondTestTask);
+
+
+        var request = get("/api/tasks")
+                .with(token)
+                .param("titleCont", secondTestTask.getName())
+                .param("assigneeId", String.valueOf(secondUser.getId()))
+                .param("status", secondStatus.getSlug())
+                .param("labelId", String.valueOf(secondLabel.getId()));
+
+
+        var result = mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andReturn();
+
+
+        var body = result.getResponse().getContentAsString();
+        assertThatJson(body)
+                .isArray()
+                .isNotEmpty()
+                .first()
+                .and(
+                        v -> v.node("id").isEqualTo(secondTestTask.getId())
+                );
+
+        var totalCount = result.getResponse().getHeader("X-Total-Count");
+        assertThat(totalCount).isNotNull();
+        assertThat(Long.valueOf(totalCount)).isEqualTo(1);
     }
 
     @Test

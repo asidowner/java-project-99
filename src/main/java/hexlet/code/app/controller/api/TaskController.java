@@ -2,6 +2,7 @@ package hexlet.code.app.controller.api;
 
 import hexlet.code.app.dto.TaskDTO.TaskCreateDTO;
 import hexlet.code.app.dto.TaskDTO.TaskDTO;
+import hexlet.code.app.dto.TaskDTO.TaskFilterDTO;
 import hexlet.code.app.dto.TaskDTO.TaskUpdateDTO;
 import hexlet.code.app.service.TaskService;
 import jakarta.validation.Valid;
@@ -30,14 +31,15 @@ public class TaskController {
 
     @GetMapping
     public ResponseEntity<List<TaskDTO>> index(
+            TaskFilterDTO taskFilterDTO,
             @RequestParam(defaultValue = "0", name = "_start") Integer start,
             @RequestParam(defaultValue = "100", name = "_end") Integer end,
             @RequestParam(defaultValue = "ASC", name = "_order") String orderDirection,
             @RequestParam(defaultValue = "id", name = "_sort") String orderProperty
     ) {
-        var users = taskService.getAll(start, end, orderDirection, orderProperty);
+        var users = taskService.getAll(taskFilterDTO, start, end, orderDirection, orderProperty);
         return ResponseEntity.ok()
-                .header("X-Total-Count", String.valueOf(taskService.countAll()))
+                .header("X-Total-Count", String.valueOf(taskService.countAll(taskFilterDTO)))
                 .body(users);
     }
 

@@ -2,10 +2,12 @@ package hexlet.code.app.service;
 
 import hexlet.code.app.dto.TaskDTO.TaskCreateDTO;
 import hexlet.code.app.dto.TaskDTO.TaskDTO;
+import hexlet.code.app.dto.TaskDTO.TaskFilterDTO;
 import hexlet.code.app.dto.TaskDTO.TaskUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundException;
 import hexlet.code.app.mapper.TaskMapper;
 import hexlet.code.app.repository.TaskRepository;
+import hexlet.code.app.specification.TaskSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,15 +26,25 @@ public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
 
-    public Long countAll() {
-        return taskRepository.count();
+    @Autowired
+    private TaskSpecification taskSpecification;
+
+    public Long countAll(TaskFilterDTO taskFilterDTO) {
+        var taskSpec = taskSpecification.build(taskFilterDTO);
+        return taskRepository.count(taskSpec);
     }
 
-    public List<TaskDTO> getAll(Integer start, Integer end, String orderDirection, String orderProperty) {
+    public List<TaskDTO> getAll(
+            TaskFilterDTO taskFilterDTO,
+            Integer start,
+            Integer end,
+            String orderDirection,
+            String orderProperty
+    ) {
         var pageRequest = getPageRequest(start, end, orderDirection, orderProperty);
+        var taskSpec = taskSpecification.build(taskFilterDTO);
 
-        return taskRepository.findAll(pageRequest)
-                .stream()
+        return taskRepository.findAll(taskSpec, pageRequest)
                 .map(taskMapper::map)
                 .toList();
     }
